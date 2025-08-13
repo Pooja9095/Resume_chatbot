@@ -1,0 +1,60 @@
+Github Profile: https://github.com/Pooja9095
+
+Projects:
+1. TODO App  
+A full-stack TODO application with individual user accounts.  
+**Stack:** Next.js, React, Bootstrap, Node.js, Express, MongoDB, Docker, Nginx  
+**Key Features:**  
+- User authentication with JWT  
+- CRUD operations for tasks with category, description, priority, and status  
+- Filtering and sorting tasks by status, text search, and priority  
+- Dockerized with Docker Compose for backend, frontend, and MongoDB  
+- Reverse proxy via Nginx for routing requests  
+**Repo:** https://github.com/pooja9095/todo-app  
+
+---
+
+2. Weather Data ETL Pipeline  
+Python-based ETL process for fetching, transforming, and storing weather data.  
+**Stack:** Python, Pandas, SQLAlchemy, SQLite, OpenWeatherMap API  
+**Key Features:**  
+- Fetches weather data from API  
+- Normalizes JSON and converts temperatures from Kelvin to Celsius  
+- Stores processed data in SQLite for querying  
+**Repo:** (https://github.com/Pooja9095/ETL_Pipeline)  
+
+---
+
+3. Financial Analytics Dashboard  
+Web app for visualizing and analyzing financial data from CSV uploads.  
+**Stack:** Python, Pandas, Plotly, Flask, Bootstrap  
+**Key Features:**  
+- Upload and parse CSV files  
+- Filter data by date range  
+- Interactive line and bar charts for revenue and expenses  
+- Session management for persistent state  
+**Repo:** (https://github.com/Pooja9095/financial_dashboard)  
+
+---
+
+4. Pen Pal Chatbot  
+A conversational chatbot app with ML model integration.  
+**Stack:** React, Flask, DialoGPT (Hugging Face Transformers)  
+**Key Features:**  
+- Real-time chat interface  
+- Context-aware conversational AI  
+- Mobile-friendly UI  
+- Robust error handling and secure CORS setup  
+**Repo:** (https://github.com/Pooja9095/pen-pal)  
+
+---
+
+5. Vocabulary Flashcards  
+Interactive vocabulary learning app.  
+**Stack:** React, Random Word API, Dictionary API  
+**Key Features:**  
+- Displays random words and their meanings on flashcards  
+- Mark words as learned, then fetch new words dynamically  
+- Handles CORS with proxy server  
+- Responsive design for mobile and desktop  
+**Repo:** (https://github.com/Pooja9095/vocab-flashcards)  
