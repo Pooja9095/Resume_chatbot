@@ -41,22 +41,22 @@ Check it out live here: [Career Conversations on Hugging Face Spaces](https://hu
 ```bash
 git clone https://github.com/Pooja9095/Resume_chatbot.git
 cd Resume_chatbot
-
+```
 2. Install requirements:  
 ```bash
 pip install -r requirements.txt
-
+```
 3. Create a .env file with your keys (these are ignored in Git for security):
 ```bash
 HF_TOKEN=your_huggingface_token
 OPENAI_API_KEY=your_openai_key # or any other free API key
 PUSHOVER_TOKEN=your_pushover_token
 PUSHOVER_USER=your_pushover_user_key
-
+```
 4. Run the chatbot locally:
 ```bash
 python resume_bot.py
-
+```
 ## License
 
 MIT License  
