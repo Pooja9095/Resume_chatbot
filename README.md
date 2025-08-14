@@ -11,10 +11,10 @@ Check it out live here: [Career Conversations on Hugging Face Spaces](https://hu
 - **Resume & GitHub Awareness**: The bot answers questions based on my resume PDF, GitHub profile text, and a background summary.  
 - **RAG (Retrieval-Augmented Generation)**: Uses semantic search to fetch relevant context from my uploaded documents before generating an answer.  
 - **SQLite Database**:  
-  - Stores questions & answers for instant responses to repeated queries.  
-  - Keeps track of users and limits free users to 5 questions. Admin (my email) has unlimited access.  
+  - Stores questions & answers for instant responses to repeated queries.
+  - Tracks **per-user session IDs** and limits free users to 5 messages per session.  
   - Logs unknown questions for future learning.  
-- **Push Notifications**: Integrates Pushover to notify me whenever a user provides their email or asks an unknown question.  
+- **Push Notifications**: Integrates Pushover to notify me whenever a user asks an unknown question.  
 - **Admin Control**: Special email bypass for unlimited questions.  
 - **Embeddings**: Uses OpenAI embeddings to semantically match questions to my documents.
 - **Flexible APIs**: Can use any free or paid API for language models, e.g., OpenAI, Groq, Llama, etc.    
