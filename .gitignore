@@ -6,4 +6,4 @@ __pycache__/
 
 # local data/artifacts
 me/db.sqlite
-me/embeddings.json
+
