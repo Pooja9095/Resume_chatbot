@@ -7,10 +7,38 @@ from pypdf import PdfReader
 import gradio as gr
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity 
-from database import get_answer, add_unknown_question, add_qa, get_user, increment_questions, add_user
-import sqlite3
-ADMIN_EMAIL = "xxx@example.com"  # replace with your real email
+from database import get_answer, add_unknown_question, add_qa, get_session, add_session, save_unknown_question, increment_questions
+import uuid
+ADMIN_SESSION_ID = "pooja_admin" 
 MAX_QUESTIONS = 5
+
+def tuples_to_oai_messages(history):
+    msgs = []
+    for user_msg, bot_msg in (history or []):
+        if user_msg:
+            msgs.append({"role": "user", "content": user_msg})
+        if bot_msg:
+            msgs.append({"role": "assistant", "content": bot_msg})
+    return msgs
+
+def add_user_message(message, history):
+    # show the user's message immediately + clear input
+    history = (history or []) + [{"role": "user", "content": message}]
+    return history, ""
+
+def bot_respond(history, state):
+    last_user = ""
+    for m in reversed(history or []):
+        if m["role"] == "user":
+            last_user = m["content"]
+            break
+
+    history_wo_last = (history or [])[:-1]
+    answer, state = me.chat(last_user, history_wo_last, state)
+
+    
+    history = history + [{"role": "assistant", "content": answer}]
+    return history, state
 
 
 load_dotenv(override=True)
@@ -122,7 +150,7 @@ def find_similar_chunks(question_embedding, chunks, embeddings, top_k=3):
     question_emb_np = np.array(question_embedding).reshape(1, -1)
     similarities = cosine_similarity(question_emb_np, embeddings_np)[0]
 
-    top_k = min(top_k, len(chunks))  # <-- prevent out of range error
+    top_k = min(top_k, len(chunks)) 
 
     top_indices = similarities.argsort()[-top_k:][::-1]
     return [chunks[i] for i in top_indices]
@@ -181,29 +209,45 @@ class Me:
     
         return system_prompt
 
-    def chat(self, message, history, user_email=None):
-        if user_email != ADMIN_EMAIL:  # admin bypass
-            user = get_user(user_email)
-            if user:
-                _, questions_asked = user
+    def chat(self, message, history, state=None):
+    # Admin command override
+        if message.strip().lower() == "/admin":
+            state = state or {}
+            state["session_id"] = ADMIN_SESSION_ID
+            return "Admin mode enabled for this session.", state
+
+    # If session_id 
+        if state is None:
+            state = {}
+        session_id = state.get("session_id")
+        
+        if session_id is None:
+            session_id = str(uuid.uuid4())
+            add_session(session_id)
+            state["session_id"] = session_id
+
+    # Only enforce limit for non-admin sessions
+        if session_id != ADMIN_SESSION_ID:
+            session = get_session(session_id)
+            if session:
+                _, questions_asked = session
                 if questions_asked >= MAX_QUESTIONS:
-                    return f"You have reached the {MAX_QUESTIONS}-question limit."
-                else:
-                    increment_questions(user_email)
+                    return f"You have reached the {MAX_QUESTIONS}-question limit.", state
+                else:                
+                    increment_questions(session_id)
             else:
-            # add new user
-                add_user(user_email)
-                increment_questions(user_email)
+                add_session(session_id)
+                increment_questions(session_id)
 
         user_message = message  # store original user text
 
     # 1. Check if question is already answered in DB
         answer = get_answer(user_message)
         if answer:
-            return answer  # Return cached answer immediately
+            return answer, state # Return cached answer immediately
 
     # 2. Embed question for RAG retrieval
-        question_embedding_response = self.openai.embeddings.create(model="text-embedding-3-small",input=user_message)
+        question_embedding_response = self.openai.embeddings.create(model="text-embedding-3-small", input=user_message)
         question_embedding = question_embedding_response.data[0].embedding
 
         relevant_chunks = find_similar_chunks(question_embedding, self.chunks, self.embeddings, top_k=3)
@@ -212,7 +256,9 @@ class Me:
     # 3. Prepare system prompt with retrieved context
         system_prompt = self.system_prompt(context=context)
 
-        messages = [{"role": "system", "content": system_prompt}] + history + [{"role": "user", "content": user_message}]
+        messages = [{"role": "system", "content": system_prompt}] + (history or []) + [{"role": "user", "content": user_message}
+]
+
 
         done = False
         while not done:
@@ -235,8 +281,7 @@ class Me:
         if "I don't know" in final_answer or "Sorry" in final_answer:
             add_unknown_question(user_message)
 
-        return final_answer
-
+        return final_answer, state
 
 if __name__ == "__main__":
     reader = PdfReader("me/Pooja_Nigam_Resume.pdf")
@@ -247,5 +292,23 @@ if __name__ == "__main__":
     
     chunks, embeddings = load_chunks_and_embeddings(resume_text, github_text)
     me = Me(chunks, embeddings)
-    gr.ChatInterface(me.chat, type="messages").launch()
+    with gr.Blocks() as demo:
+        state = gr.State(value={})  
+        chatbox = gr.Chatbot(type="messages")
+        msg = gr.Textbox(placeholder="Type your message here")
+        state = gr.State(value={})
+
+        def respond(message, history, state):
+                answer, state = me.chat(message, history, state)
+                history = (history or []) + [{"role": "user", "content": message}, {"role": "assistant", "content": answer},
+                ]
+                return history, state, ""
+
+       
+        msg.submit(add_user_message, inputs=[msg, chatbox], outputs=[chatbox, msg],).then(bot_respond,inputs=[chatbox, state], outputs=[chatbox, state])
+
+
+    demo.launch()
+  
+
 

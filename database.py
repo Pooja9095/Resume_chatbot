@@ -3,6 +3,17 @@ import sqlite3
 def init_db():
     conn = sqlite3.connect('me/db.sqlite')
     c = conn.cursor()
+    
+    # Table for tracking sessions and question limits
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS sessions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id TEXT UNIQUE,
+            questions_asked INTEGER DEFAULT 0
+        )
+    ''')
+    
+    # Table for storing known Q&A
     c.execute('''
         CREATE TABLE IF NOT EXISTS qa (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -10,20 +21,8 @@ def init_db():
             answer TEXT
         )
     ''')
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT UNIQUE,
-            name TEXT,
-            notes TEXT
-        )
-    ''')
-    try:
-        c.execute("ALTER TABLE users ADD COLUMN questions_asked INTEGER DEFAULT 0")
-    except sqlite3.OperationalError:
-        # Column already exists, do nothing
-        pass
-
+    
+    # Table for storing unknown questions
     c.execute('''
         CREATE TABLE IF NOT EXISTS unknown_questions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -31,6 +30,32 @@ def init_db():
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+    
+    conn.commit()
+    conn.close()
+
+def get_session(session_id):
+    conn = sqlite3.connect('me/db.sqlite')
+    c = conn.cursor()
+    c.execute("SELECT id, questions_asked FROM sessions WHERE session_id = ?", (session_id,))
+    row = c.fetchone()
+    conn.close()
+    return row
+
+def add_session(session_id):
+    conn = sqlite3.connect('me/db.sqlite')
+    c = conn.cursor()
+    try:
+        c.execute("INSERT INTO sessions (session_id, questions_asked) VALUES (?, ?)", (session_id, 0))
+        conn.commit()
+    except sqlite3.IntegrityError:
+        pass
+    conn.close()
+
+def save_unknown_question(question):
+    conn = sqlite3.connect('me/db.sqlite')
+    c = conn.cursor()
+    c.execute("INSERT INTO unknown_questions (question) VALUES (?)", (question,))
     conn.commit()
     conn.close()
 
@@ -40,11 +65,10 @@ def add_qa(question, answer):
     try:
         c.execute("INSERT INTO qa (question, answer) VALUES (?, ?)", (question, answer))
     except sqlite3.IntegrityError:
-        # If question already exists, update the answer
+        # Update if question already exists
         c.execute("UPDATE qa SET answer = ? WHERE question = ?", (answer, question))
     conn.commit()
     conn.close()
-
 
 def get_answer(question):
     conn = sqlite3.connect('me/db.sqlite')
@@ -54,16 +78,6 @@ def get_answer(question):
     conn.close()
     return row[0] if row else None
 
-def add_user(email, name=None, notes=None):
-    conn = sqlite3.connect('me/db.sqlite')
-    c = conn.cursor()
-    try:
-        c.execute("INSERT INTO users (email, name, notes, questions_asked) VALUES (?, ?, ?, ?)", (email, name, notes, 0))
-        conn.commit()
-    except sqlite3.IntegrityError:
-        pass
-    conn.close()
-
 def add_unknown_question(question):
     conn = sqlite3.connect('me/db.sqlite')
     c = conn.cursor()
@@ -71,20 +85,11 @@ def add_unknown_question(question):
     conn.commit()
     conn.close()
 
-def get_user(email):
+def increment_questions(session_id):
     conn = sqlite3.connect('me/db.sqlite')
     c = conn.cursor()
-    c.execute("SELECT id, questions_asked FROM users WHERE email = ?", (email,))
-    row = c.fetchone()
-    conn.close()
-    return row  # returns (id, questions_asked) or None
-
-def increment_questions(email):
-    conn = sqlite3.connect('me/db.sqlite')
-    c = conn.cursor()
-    c.execute("UPDATE users SET questions_asked = questions_asked + 1 WHERE email = ?", (email,))
+    c.execute("UPDATE sessions SET questions_asked = questions_asked + 1 WHERE session_id = ?", (session_id,))
     conn.commit()
     conn.close()
-
 
 init_db()
