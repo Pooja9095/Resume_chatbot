@@ -2,7 +2,7 @@
 
 Interact with a smart chatbot that knows my professional background, skills, experience, and career details! Ask it questions about my resume, GitHub profile, and career details, and it responds intelligently using a combination of database storage, embeddings, and retrieval techniques.  
 
-Check it out live here: [Career Conversations on Hugging Face Spaces](https://huggingface.co/spaces/Pooja-Nigam/Career_Conversations)
+Check it out live here: [Career Conversations on Hugging Face Spaces](https://huggingface.co/spaces/Pooja-Nigam/Career_Conversation)
 
 ---
 
