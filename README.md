@@ -25,7 +25,7 @@ Check it out live here: [Career Conversations on Hugging Face Spaces](https://hu
 
 - Python 3.x  
 - [Gradio](https://gradio.app/) – for the interactive web interface  
-- [OpenAI API](https://platform.openai.com/) – embeddings and GPT-4o-mini responses  
+- [Mistral API](https://docs.mistral.ai/) – embeddings and Mistral AI responses  
 - [Hugging Face Hub](https://huggingface.co/) – to deploy the Space publicly  
 - [PyPDF](https://pypi.org/project/pypdf/) – to extract text from PDF resumes  
 - [Requests](https://pypi.org/project/requests/) – API requests for push notifications and HF API  
@@ -49,7 +49,7 @@ pip install -r requirements.txt
 3. Create a .env file with your keys (these are ignored in Git for security):
 ```bash
 HF_TOKEN=your_huggingface_token
-OPENAI_API_KEY=your_openai_key # or any other free API key
+MISTRAL_API_KEY=your_mistral_key # or any other API key
 PUSHOVER_TOKEN=your_pushover_token
 PUSHOVER_USER=your_pushover_user_key
 ```
