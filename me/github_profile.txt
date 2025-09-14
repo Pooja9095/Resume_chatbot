@@ -1,7 +1,18 @@
 Github Profile: https://github.com/Pooja9095
 
 Projects:
-1. TODO App  
+1. Career Conversations – Resume Chatbot
+A chatbot that answers questions about my resume and GitHub using RAG.
+**Stack:** Python, Gradio, SQLite, OpenAI/Groq/Llama, scikit-learn, PyPDF, Hugging Face Spaces
+**Key Features:**
+- RAG with embeddings + cosine similarity
+- Reads resume PDF, GitHub profile, and background summary
+-Caches Q&A in SQLite; logs unknown questions
+-Per-user sessions with 5 free messages; admin email bypass
+-Pushover alerts for unknown questions
+**Repo:** https://github.com/Pooja9095/Resume_chatbot
+
+2. TODO App  
 A full-stack TODO application with individual user accounts.  
 **Stack:** Next.js, React, Bootstrap, Node.js, Express, MongoDB, Docker, Nginx  
 **Key Features:**  
@@ -14,7 +25,7 @@ A full-stack TODO application with individual user accounts.
 
 ---
 
-2. Weather Data ETL Pipeline  
+3. Weather Data ETL Pipeline  
 Python-based ETL process for fetching, transforming, and storing weather data.  
 **Stack:** Python, Pandas, SQLAlchemy, SQLite, OpenWeatherMap API  
 **Key Features:**  
@@ -25,7 +36,7 @@ Python-based ETL process for fetching, transforming, and storing weather data.
 
 ---
 
-3. Financial Analytics Dashboard  
+4. Financial Analytics Dashboard  
 Web app for visualizing and analyzing financial data from CSV uploads.  
 **Stack:** Python, Pandas, Plotly, Flask, Bootstrap  
 **Key Features:**  
@@ -37,7 +48,7 @@ Web app for visualizing and analyzing financial data from CSV uploads.
 
 ---
 
-4. Pen Pal Chatbot  
+5. Pen Pal Chatbot  
 A conversational chatbot app with ML model integration.  
 **Stack:** React, Flask, DialoGPT (Hugging Face Transformers)  
 **Key Features:**  
@@ -49,7 +60,7 @@ A conversational chatbot app with ML model integration.
 
 ---
 
-5. Vocabulary Flashcards  
+6. Vocabulary Flashcards  
 Interactive vocabulary learning app.  
 **Stack:** React, Random Word API, Dictionary API  
 **Key Features:**  

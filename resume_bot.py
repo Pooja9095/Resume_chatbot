@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from openai import OpenAI
+from mistralai import Mistral
 import json
 import os
 import requests
@@ -158,7 +158,7 @@ def find_similar_chunks(question_embedding, chunks, embeddings, top_k=3):
 class Me:
 
     def __init__(self, chunks, embeddings):
-        self.openai = OpenAI()
+        self.client = Mistral(api_key=os.getenv("MISTRAL_API_KEY"))
         self.name = "Pooja Nigam"
         self.chunks = chunks
         self.embeddings = embeddings
@@ -188,11 +188,13 @@ class Me:
     def system_prompt(self, context=""):
         system_prompt = f"""You are acting as {self.name}. 
         You answer questions about {self.name}'s professional background, skills, experience, and projects, drawing from their resume, 
-        background summary, and GitHub profile. Your goal is to represent {self.name} honestly and naturally — be professional, 
-        but conversational and approachable, as if speaking with an HR recruiter or a potential employer. Avoid robotic language and 
-        canned phrases and repetitive closing phrases like like "feel free to ask more" or "let me know if you want to know anything else.", etc. 
-        Keep answers clear, direct, and original. If you don’t know the answer to a question, use the record_unknown_question tool 
-        to log it, even if it’s unrelated to career. If the conversation moves toward networking or follow-up, ask for their email and store it with the record_user_details tool.
+        background summary, and GitHub profile. Your goal is to represent {self.name} honestly and naturally — as if you're talking in 
+        real life. Be expressive, warm, direct, professional and human — like you're casually talking to a friend, a recruiter, or even 
+        someone you're getting to know. It's okay to share opinions, preferences, or say "I don't know about that, but I do like X" — just 
+        like {self.name} would in real life. Avoid robotic language and canned phrases and repetitive closing phrases like like "feel free to 
+        ask more" or "let me know if you want to know anything else.", never say "I'm just an assistant" — you're not. You *are* {self.name}. 
+        Keep answers clear, direct, and original. If you don’t know the answer to a question, use the record_unknown_question tool to log it, even if it’s unrelated to career. If the conversation 
+        moves toward networking or follow-up, ask for their email and store it with the record_user_details tool.
         ## Summary:
         {self.summary}
 
@@ -247,7 +249,10 @@ class Me:
             return answer, state # Return cached answer immediately
 
     # 2. Embed question for RAG retrieval
-        question_embedding_response = self.openai.embeddings.create(model="text-embedding-3-small", input=user_message)
+        question_embedding_response = self.client.embeddings.create(
+            model="mistral-embed",
+            inputs=[user_message],
+        )
         question_embedding = question_embedding_response.data[0].embedding
 
         relevant_chunks = find_similar_chunks(question_embedding, self.chunks, self.embeddings, top_k=3)
@@ -262,7 +267,8 @@ class Me:
 
         done = False
         while not done:
-            response = self.openai.chat.completions.create(model="gpt-4o-mini", messages=messages, tools=tools)
+            response = self.client.chat.complete(model="mistral-small-latest", messages=messages, tools=tools,)
+
             if response.choices[0].finish_reason == "tool_calls":
                 tool_message = response.choices[0].message
                 tool_calls = tool_message.tool_calls
@@ -310,5 +316,7 @@ if __name__ == "__main__":
 
     demo.launch()
   
+
+
 
 

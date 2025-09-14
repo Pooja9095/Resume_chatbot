@@ -1,9 +1,10 @@
 gradio
-openai
 pypdf
 requests
 huggingface-hub
 numpy
 scikit-learn
 python-dotenv
+mistralai
+
 

@@ -1,12 +1,12 @@
 import os
 from dotenv import load_dotenv
-from openai import OpenAI
+from mistralai import Mistral
 from pypdf import PdfReader
 import json
 
 load_dotenv()
 
-openai = OpenAI()
+client = Mistral(api_key=os.getenv("MISTRAL_API_KEY"))
 
 def load_pdf_text(file_path):
     reader = PdfReader(file_path)
@@ -38,8 +38,8 @@ def create_embeddings(text_chunks):
     for i, chunk in enumerate(text_chunks):
         # Add print for debugging chunk length
         print(f"Embedding chunk {i+1}/{len(text_chunks)} (length {len(chunk)})")
-        response = openai.embeddings.create(
-            model="text-embedding-3-small", input=chunk
+        response = client.embeddings.create(
+            model="mistral-embed", inputs=[chunk]
         )
         embeddings.append(response.data[0].embedding)
     return embeddings
